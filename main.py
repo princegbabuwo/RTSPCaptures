@@ -1,4 +1,10 @@
-def main():
-    print (cv2.__file__)
+from modules import RTSPScript
 
-main()
+rtsp_url = None
+
+def main():
+    rtsp_url = ''
+    ExecuteScript()
+
+def ExecuteScript():
+    RTSPScript(rtsp_url=rtsp_url)
