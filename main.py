@@ -5,20 +5,19 @@ def main():
     rtsp_url = 'http://camera.buffalotrace.com/mjpg/video.mjpg'
     interval = 10
     try:
-        rtsp = RTSP.Initialize()
-        stream = rtsp.OpenStream(rtsp_url=rtsp_url) #initialize RTSP module paramenters
+        stream = RTSP.OpenStream(rtsp_url=rtsp_url) #initialize RTSP module paramenters
         #print(stream)
 
         #Capture Frame every 5 secs
         while True:
-            ExecuteScript(rtsp, stream)
+            ExecuteScript(stream)
             time.sleep(interval)
     except Exception as e: #Here we want to capture the errors as much as possible
         ExceptionHandler(sys, e, 1)
 
-def ExecuteScript(rtsp, stream):
+def ExecuteScript(stream):
     #print(rtsp)
-    print (rtsp.CaptureFrame(stream))
+    print (stream.CaptureFrame())
 
 def ExceptionHandler(sys, e, exit_code):
     exc_type, exc_obj, exc_tb = sys.exc_info()
