@@ -1,4 +1,4 @@
-import cv2
+import time, cv2
 
 class OpenStream:
     rtsp_url = None
@@ -16,8 +16,13 @@ class OpenStream:
         return frame
     
     def __frametoImage(self, frame):
-         image_data, _ = cv2.imencode(self.img_ext, frame)
-         return image_data
+        captured, data = cv2.imencode(self.img_ext, frame)
+        #print (f"Status: {captured} \nData2: {data}")
+        #print (f"frame: {frame}")
+
+        if not captured:
+            raise ValueError("Image convertion failed")
+        return data
 
     def __openStream(self):
         stream = cv2.VideoCapture(self.rtsp_url)
@@ -25,10 +30,15 @@ class OpenStream:
             raise IOError('Stream failed to open')
         return stream
     
-    def EndStream(self):
-        self.stream.release()
+    def __createFilename(self):
+        return f"img_{time.time()}.jpg"
 
     def CaptureFrame(self):
         #This function will capture the frame, convert and return the converted file
+        
+        filename = self.__createFilename() #Create File Name
         frame = self.__captureFrame() #Capture frame
-        return self.__frametoImage(frame) #convert and return frame
+        return filename, self.__frametoImage(frame) #convert and return frame
+    
+    def Release(self):
+        self.stream.release()

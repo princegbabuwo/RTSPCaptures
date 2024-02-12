@@ -1,4 +1,3 @@
-import time
 from ftplib import FTP
 
 class Connect:
@@ -21,16 +20,11 @@ class Connect:
         self.ftp.login(self.ftp_user, self.ftp_password)
         
         #Change dir
-        self.ftp.cwd(self.ftp_dir)
-
-    def __createFilename(self):
-        return f"img_{time.time()}"
+        if bool(self.ftp_dir): self.ftp.cwd(self.ftp_dir)
     
-    def UploadImageData(self, image_data):
-        filename = self.__createFilename()
-        with open(filename, "wb") as f:
-            f.write(image_data.tobytes())
-        self.ftp.storbinary(f"STOR {filename}", f)
+    def UploadImageData(self, file):
+        self.ftp.storbinary(f"STOR {file}", open(file, 'rb'))
+        return True
 
     def Close(self):
         #Close connections
