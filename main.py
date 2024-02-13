@@ -5,14 +5,49 @@ from interface import GUI
 from tkinter import *
 from tkinter import ttk
 
-class Main:
-    def __init__(self) -> None:
-        root = self.__root()
-        rootFrame = self.__rootFrame(root)
-        settings = self.__settings(rootFrame) 
-        urlFrame, urlLabel, urlText = self.__RSTPURLFrame(rootFrame)
-        imgBoxFrame, imgBox = self.__imageBox(rootFrame)
-        captureButton = self.__captureButton(rootFrame)
+class GUI:
+    def Homepage(self) -> None:
+        root = Tk()
+        root.title("RTSP Stream Capture")
+        root.resizable(False, False)
+
+        style = ttk.Style()
+        style.configure('url.TEntry', padding=(10, 5))
+        style.configure('capture.TButton', font=("Arial", 12, "bold"), padding=(0, 12))
+        style.configure('icon.TButton', padding=5)
+
+        rootFrame = ttk.Frame(root, padding=20)
+
+        #url Box Frame
+        urlFrame = ttk.Frame(rootFrame, borderwidth=1, relief='solid', padding=10)
+        urlLabel = ttk.Label(urlFrame, text="Enter RTSP URL:", font=("Arial", 12, "bold"))
+        #urlTextFrame = ttk.Frame(urlFrame, background='white')
+        urlText = ttk.Entry(urlFrame, width=80, style='url.TEntry')
+
+        #mediaCanvas
+        mediaFrame = ttk.Frame(rootFrame, padding=20)
+        mediaCanvas = Canvas(mediaFrame, width=480, height=270, background='gray75')
+
+        #ButtonsFrame
+        buttonFrame = ttk.Frame(rootFrame)
+        capturButton = ttk.Button(buttonFrame, text="START CAPTURE", width=52, style='capture.TButton' ,command=self.Events.StartCapture)
+        settingsIcon = PhotoImage(file='assets/settings.png')
+        settingsButton = ttk.Button(buttonFrame, image=settingsIcon, text="settings", width=5, style='icon.TButton', command=self.Events.OpenDialogForSettings)
+
+        rootFrame.grid(column=0, row=0)
+
+        urlFrame.grid(column=0, row=0, sticky=EW) #parent=>rootFrame
+        urlLabel.grid(column=0, row=0, sticky=W)
+        urlText.grid(column=0, row=1, columnspan=2, sticky=EW)
+
+        mediaFrame.grid(column=0, row=1) #parent=>rootFrame
+        mediaCanvas.grid(column=0, row=0, sticky=NSEW) #parent=>mediaFrame
+
+        buttonFrame.grid(column=0, row=2, sticky=EW) #parent=>rootFrame
+        capturButton.grid(column=0, row=0)
+        settingsButton.grid(column=1, row=0)
+
+
         root.mainloop()
 
     def __root(self):
@@ -23,42 +58,42 @@ class Main:
         return root
 
     def __rootFrame(self, parent):
-        frame = ttk.Frame(parent, height=500)
-        frame.grid(column=0, row=0, sticky=(N, W, E, S))
-
-    def __settings(self, parent):
-        button = ttk.Button(parent, text="{-}", command=self.Events.OpenDialogForSettings)
-        button.grid(column=2, row=0, sticky=(N, E))
+        frame = ttk.Frame(parent, padding=(20, 20, 20, 20))
+        frame.grid(column=0, row=0)
     
 
     def __RSTPURLFrame(self, parent):
-        frame = ttk.Frame(parent, borderwidth=1, relief='solid')
-        frame.grid(column=1, row=0, sticky=(N, W, E))
+        frame = ttk.Frame(parent, borderwidth=1, relief='solid', width=200, height=100)
+        frame.grid(column=0, row=0, sticky=EW)
 
         label = ttk.Label(frame, text="Enter RTSP URL:")
-        label.grid(column=0, row=0, sticky=(N, W))
+        label.grid(column=0, row=0, sticky=W)
 
-        text = ttk.Entry(frame)
-        text.grid(column=0, row=1, sticky=(N, W))
+        text = ttk.Entry(frame, width=50)
+        text.grid(column=0, row=1, sticky=W)
 
         return frame, label, text
+    
+    def __settings(self, parent):
+        button = ttk.Button(parent, text="{-}", command=self.Events.OpenDialogForSettings)
+        button.grid(column=2, row=1)
     
     def __imageBox(self, parent):
         style = ttk.Style()
         style.configure('Box.TFrame', background='red', padding=5, borderwidth=5, relief='raised')
         style.configure('Box.TLabel', background='grey', borderwith=2, relief='raised')
 
-        frame = ttk.Frame(parent, width=100, height=100, style="Box.TFrame")
-        frame.grid(column=1, row=1, sticky=(N, W, E, S))
+        frame = ttk.Frame(parent, style="")
+        frame.grid(column=2, row=2)
 
-        box = ttk.Label(frame, width=100, style='Box.TLabel')
-        box.grid(column=0, row=0, sticky=(N, S))
+        box = ttk.Label(frame, style='')
+        box.grid(column=1, row=1,)
 
         return frame, box
     
     def __captureButton(self, parent):
         button = ttk.Button(parent, text="START CAPTURING", command=self.Events.StartCapture)
-        button.grid(column=1, row=2, sticky=(N, W, E))
+        button.grid(column=2, row=3)
 
         return button
     
