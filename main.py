@@ -1,113 +1,258 @@
+from logging import PlaceHolder
 import os, sys, time, traceback
-from turtle import width
+#from turtle import width
 from scripts import RTSP, FTP
-from interface import GUI
+#from interface import GUI
 from tkinter import *
-from tkinter import ttk
+from tkinter import ttk, messagebox
+import yaml
+
+class Script:
+    def getFTPServerConfiguration(self):
+        pass
+
+    def checkFTPServerConfiguration(self):
+        try: 
+            with open('config.yaml', 'r') as f:
+                config = yaml.safe_load(f)
+            f.close()
+        except FileNotFoundError: return False
+        except Exception as e:
+            self.ExceptionHandler(sys, e, 1)
+            return False
+        else: return True
+
+    def updateConfigurationFile(self):
+        #if not script.checkFTPServerConfiguration(): pass
+            #create yaml file
+        data = script.defineYamlFile(gui.SettingsWindows.serverEntry.get(), 
+                    gui.SettingsWindows.userEntry.get(),
+                    gui.SettingsWindows.passwordEntry.get(),
+                    gui.SettingsWindows.dirEntry.get(),
+                    gui.SettingsWindows.intervalEntry.get())
+        #return print(data)
+
+        with open('config.yaml', 'w') as f:
+            yaml.dump(data, f, allow_unicode=True)
+        f.close
+        
+        return True
+
+    def defineYamlFile(self, server, user, password, dir, interval):
+        return {
+            'server': server,
+            'user': user,
+            'password': password,
+            'dir': dir,
+            'interval': interval,
+        }
+
+
+    def ExceptionHandler(self, sys, e, exit_code):
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        file_name = exc_tb.tb_frame.f_code.co_filename
+        line_number = exc_tb.tb_lineno
+        traceback.print_tb(exc_tb)
+        print(f"\nError: {str(e)}")
+        sys.exit(exit_code)
 
 class GUI:
-    def Homepage(self) -> None:
-        root = Tk()
-        root.title("RTSP Stream Capture")
-        root.resizable(False, False)
+    def __init__(self) -> None:
+        self.HomeWindows = self.HomeWindows()
+        self.SettingsWindows = self.SettingsWindows()
+        self.Events = self.Events()
 
-        style = ttk.Style()
-        style.configure('url.TEntry', padding=(10, 5))
-        style.configure('capture.TButton', font=("Arial", 12, "bold"), padding=(0, 12))
-        style.configure('icon.TButton', padding=5)
+    class HomeWindows:
+        def __init__(self) -> None:
+            self.window = Tk()
+            self.window.title("RTSP Stream Capture")
+            self.window.resizable(False, False)
 
-        rootFrame = ttk.Frame(root, padding=20)
+            style = ttk.Style()
+            style.configure('url.TEntry', padding=(10, 5))
+            style.configure('capture.TButton', font=("Arial", 12, "bold"), padding=(0, 12))
+            style.configure('icon.TButton', padding=5)
 
-        #url Box Frame
-        urlFrame = ttk.Frame(rootFrame, borderwidth=1, relief='solid', padding=10)
-        urlLabel = ttk.Label(urlFrame, text="Enter RTSP URL:", font=("Arial", 12, "bold"))
-        #urlTextFrame = ttk.Frame(urlFrame, background='white')
-        urlText = ttk.Entry(urlFrame, width=80, style='url.TEntry')
+            windowFrame = ttk.Frame(self.window, padding=20)
 
-        #mediaCanvas
-        mediaFrame = ttk.Frame(rootFrame, padding=20)
-        mediaCanvas = Canvas(mediaFrame, width=480, height=270, background='gray75')
+            #url Box Frame
+            urlFrame = ttk.Frame(windowFrame, borderwidth=1, relief='solid', padding=10)
+            urlLabel = ttk.Label(urlFrame, text="Enter RTSP URL:", font=("Arial", 12, "bold"))
+            urlText = ttk.Entry(urlFrame, width=80, style='url.TEntry')
 
-        #ButtonsFrame
-        buttonFrame = ttk.Frame(rootFrame)
-        capturButton = ttk.Button(buttonFrame, text="START CAPTURE", width=52, style='capture.TButton' ,command=self.Events.StartCapture)
-        settingsIcon = PhotoImage(file='assets/settings.png')
-        settingsButton = ttk.Button(buttonFrame, image=settingsIcon, text="settings", width=5, style='icon.TButton', command=self.Events.OpenDialogForSettings)
+            #mediaCanvas
+            mediaFrame = ttk.Frame(windowFrame, padding=20)
+            mediaCanvas = Canvas(mediaFrame, width=480, height=270, background='gray75')
 
-        rootFrame.grid(column=0, row=0)
+            #ButtonsFrame
+            buttonFrame = ttk.Frame(windowFrame)
+            captureButton = ttk.Button(buttonFrame, text="START CAPTURE", width=52, style='capture.TButton')
+            settingsIcon = PhotoImage(file='assets/settings.png')
+            settingsButton = ttk.Button(buttonFrame, image=settingsIcon, width=5, style='icon.TButton')
 
-        urlFrame.grid(column=0, row=0, sticky=EW) #parent=>rootFrame
-        urlLabel.grid(column=0, row=0, sticky=W)
-        urlText.grid(column=0, row=1, columnspan=2, sticky=EW)
+            windowFrame.grid(column=0, row=0)
 
-        mediaFrame.grid(column=0, row=1) #parent=>rootFrame
-        mediaCanvas.grid(column=0, row=0, sticky=NSEW) #parent=>mediaFrame
+            urlFrame.grid(column=0, row=0, sticky=EW) #parent=>rootFrame
+            urlLabel.grid(column=0, row=0, sticky=W)
+            urlText.grid(column=0, row=1, columnspan=2, sticky=EW)
 
-        buttonFrame.grid(column=0, row=2, sticky=EW) #parent=>rootFrame
-        capturButton.grid(column=0, row=0)
-        settingsButton.grid(column=1, row=0)
+            mediaFrame.grid(column=0, row=1) #parent=>rootFrame
+            mediaCanvas.grid(column=0, row=0, sticky=NSEW) #parent=>mediaFrame
 
-
-        root.mainloop()
-
-    def __root(self):
-        root = Tk()
-        root.title("RTSP Stream Capture")
-        #root.columnconfigure(0, weight=1)
-        #root.rowconfigure(0, weight=1)
-        return root
-
-    def __rootFrame(self, parent):
-        frame = ttk.Frame(parent, padding=(20, 20, 20, 20))
-        frame.grid(column=0, row=0)
+            buttonFrame.grid(column=0, row=2, sticky=EW) #parent=>rootFrame
+            captureButton.grid(column=0, row=0)
+            settingsButton.grid(column=1, row=0)
     
+            #Here check if server have been configured
+            #self.Events(HomeWindows=self) .BeforeWindowsOpen()
+            #self.window.mainloop()
 
-    def __RSTPURLFrame(self, parent):
-        frame = ttk.Frame(parent, borderwidth=1, relief='solid', width=200, height=100)
-        frame.grid(column=0, row=0, sticky=EW)
+        def call(self):
+            gui.Events.BeforeWindowsOpen()
+            gui.HomeWindows.draw()
 
-        label = ttk.Label(frame, text="Enter RTSP URL:")
-        label.grid(column=0, row=0, sticky=W)
+        def draw(self):
+            gui.HomeWindows.window.mainloop()
 
-        text = ttk.Entry(frame, width=50)
-        text.grid(column=0, row=1, sticky=W)
+    class SettingsWindows:
+        def __draw(self) -> None:
+            self.window = Toplevel(gui.HomeWindows.window)
+            self.window.title("RTSP Stream Capture: Settings")
+            self.window.resizable(False, False)
+            self.window.wm_attributes("-topmost", True)
+            self.window.protocol("WM_DELETE_WINDOW", gui.SettingsWindows.dismiss)
 
-        return frame, label, text
-    
-    def __settings(self, parent):
-        button = ttk.Button(parent, text="{-}", command=self.Events.OpenDialogForSettings)
-        button.grid(column=2, row=1)
-    
-    def __imageBox(self, parent):
-        style = ttk.Style()
-        style.configure('Box.TFrame', background='red', padding=5, borderwidth=5, relief='raised')
-        style.configure('Box.TLabel', background='grey', borderwith=2, relief='raised')
+            style = ttk.Style()
+            style.configure("number_entry.TEntry", validchars="0123456789")
 
-        frame = ttk.Frame(parent, style="")
-        frame.grid(column=2, row=2)
 
-        box = ttk.Label(frame, style='')
-        box.grid(column=1, row=1,)
+            self.windowFrame = ttk.Frame(self.window, padding=20)
+            self.windowFrame.grid(column=0, row=0, sticky=NSEW)
 
-        return frame, box
-    
-    def __captureButton(self, parent):
-        button = ttk.Button(parent, text="START CAPTURING", command=self.Events.StartCapture)
-        button.grid(column=2, row=3)
+            self.title = ttk.Label(self.windowFrame, text='Configure FTP Server', font=("Arial", 12, "bold"))
+            self.title.grid(column=0, row=0, sticky=W)
+            #Add LineThrough
 
-        return button
-    
+            self.serverFrame = ttk.Frame(self.windowFrame, padding=(0, 10))
+            self.serverFrame.grid(column=0, row=1, sticky=W)
+            self.serverLabel = ttk.Label(self.serverFrame, text="FTP Server:")
+            self.serverEntry = ttk.Entry(self.serverFrame, width=40)
+            self.serverLabel.grid(column=0, row=0, sticky=W)
+            self.serverEntry.grid(column=0, row=1, sticky=W)
+            #Add LineThrough
+
+            self.userFrame = ttk.Frame(self.windowFrame, padding=(0, 0, 0, 10))
+            self.userFrame.grid(column=0, row=2, sticky=W)
+            self.userLabel = ttk.Label(self.userFrame, text="Username:")
+            self.userEntry = ttk.Entry(self.userFrame, width=40)
+            self.userLabel.grid(column=0, row=0, sticky=W)
+            self.userEntry.grid(column=0, row=1, sticky=W)
+            #Add LineThrough
+
+            self.passwordFrame = ttk.Frame(self.windowFrame, padding=(0, 0, 0, 10))
+            self.passwordFrame.grid(column=0, row=3, sticky=W)
+            self.passwordLabel = ttk.Label(self.passwordFrame, text="Password:")
+            self.passwordEntry = ttk.Entry(self.passwordFrame, width=40, show="*")
+            self.passwordLabel.grid(column=0, row=0, sticky=W)
+            self.passwordEntry.grid(column=0, row=1, sticky=W)
+            #Add LineThrough
+
+            self.dirFrame = ttk.Frame(self.windowFrame, padding=(0, 0, 0, 10))
+            self.dirFrame.grid(column=0, row=4, sticky=W)
+            self.dirLabel = ttk.Label(self.dirFrame, text="Directory Path")
+            self.dirEntry = ttk.Entry(self.dirFrame, width=40)
+            self.dirLabel.grid(column=0, row=0, sticky=W)
+            self.dirEntry.grid(column=0, row=1, sticky=W)
+
+            self.intervalFrame = ttk.Frame(self.windowFrame, padding=(0, 0, 0, 10))
+            self.intervalFrame.grid(column=0, row=5, sticky=W)
+            self.intervalLabel = ttk.Label(self.intervalFrame, text="Set Capture Intervals(sec):")
+            self.intervalEntry = ttk.Entry(self.intervalFrame, width=22, validate="key")
+            self.intervalLabel.grid(column=0, row=0, sticky=W)
+            self.intervalEntry.grid(column=0, row=1, sticky=W)
+            #Add LineThrough
+
+            self.saveButton = ttk.Button(self.windowFrame, text='save', command=gui.Events.saveServerInformation)
+            self.saveButton.grid(column=0, row=6, sticky=W)
+
+        """
+        def __numberChar(self, new_text):
+            if not new_text.isdigit():
+                return False
+            return True
+        """
+
+        def show(self):
+            gui.SettingsWindows.__draw()
+            gui.SettingsWindows.window.grab_set()
+            gui.SettingsWindows.window.wait_window()
+        
+        def dismiss(self):
+            #print('Im in dismiss')
+            if not script.checkFTPServerConfiguration():
+                messagebox.showinfo(message='Configure FTP Server Information!')
+                return False
+            gui.SettingsWindows.window.grab_release()
+            gui.SettingsWindows.window.destroy()
+
+        def validateForm(self):
+            if gui.SettingsWindows.serverEntry.get() == '':
+                messagebox.showinfo(message='Enter FTP server address')
+                return False
+            if gui.SettingsWindows.userEntry.get() == '':
+                messagebox.showinfo(message='Enter FTP server username')
+                return False
+            if gui.SettingsWindows.passwordEntry.get() == '':
+                messagebox.showinfo(message='Enter FTP server password')
+                return False
+            if gui.SettingsWindows.dirEntry.get() == '':
+                messagebox.showinfo(message='Enter FTP server directory')
+                return False
+            if int(gui.SettingsWindows.validateIntergerEntry()) < 1:
+                messagebox.showinfo(message='Intervals should be a positive number')
+                return False
+            return True
+        
+        def validateIntergerEntry(self):
+            try: interval = int(gui.SettingsWindows.intervalEntry.get().strip())
+            except ValueError: return 0
+            else: return interval
+
     class Events:
+        GUI = None
+        HomeWindows = None
+        SettingsWindow  = None
+        def __init__(self, GUI=GUI, HomeWindows=HomeWindows, SettingsWindow=SettingsWindow) -> None:
+            self.GUI = self.GUI
+            self.HomeWindows = HomeWindows
+            self.SettingsWindow = SettingsWindow
+            print(f'Settings Windows @-Event: {self.SettingsWindow}')
+
+        def BeforeWindowsOpen(self):
+            #print(f'FTP Server Check: {not script.checkFTPServerConfiguration()}')
+            if not script.checkFTPServerConfiguration():
+                gui.Events.OpenDialogForSettings()
+
         def OpenDialogForSettings(self):
-            pass
+            gui.SettingsWindows.show()
+
+        def saveServerInformation(self):
+            if gui.SettingsWindows.validateForm():
+                script.updateConfigurationFile()
+                messagebox.showinfo(message='Server Information updated!')
+                gui.SettingsWindows.dismiss()
 
         def StartCapture(self):
             pass
 
-def main():
-    Main()
+script = Script()
+gui = GUI()
 
-def script():
+def main():
+    gui.HomeWindows.call()
+    pass
+
+def _script():
     #return print ("script")
     #define apps inputs/vatiables
     rtsp_url = 'http://camera.buffalotrace.com/mjpg/video.mjpg'
