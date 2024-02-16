@@ -26,7 +26,7 @@ class Connect:
         self.ftp.storbinary(f"STOR {file}", open(file, 'rb'))
         return True
 
-    def Close(self):
+    def close(self):
         #Close connections
         self.ftp.quit()
         

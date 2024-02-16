@@ -38,7 +38,7 @@ class OpenStream:
         
         filename = self.__createFilename() #Create File Name
         frame = self.__captureFrame() #Capture frame
-        return filename, self.__frametoImage(frame) #convert and return frame
+        return filename, frame, self.__frametoImage(frame) #convert and return frame
     
-    def Release(self):
+    def release(self):
         self.stream.release()
