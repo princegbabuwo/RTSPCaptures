@@ -59,7 +59,7 @@ def HomeWindow():
     mediaFrame.grid(column=0, row=1) #parent=>rootFrame
     mediaCanvas.grid(column=0, row=0, sticky=NSEW) #parent=>mediaFrame
     mediaImage.grid(column=0, row=0, sticky=NSEW)
-    mediaLabel.grid(column=0, row=0, sticky=S, pady=10)
+    mediaLabel.grid(column=0, row=0)
 
     buttonFrame.grid(column=0, row=2, sticky=EW) #parent=>rootFrame
     captureButton.grid(column=0, row=0)
@@ -117,16 +117,14 @@ def MainProcess(window, captureButton, mediaImage, mediaLabel, rtsp_url, ftp_ser
     var_list = ('',)
 
     try:
-        #with lock: mediaLabel.configure(text = '...Loading')
+        with lock: mediaLabel.configure(text = '...Loading')
 
-        #get stream
         if not thread_flag: raise Flag(var_list)
         stream = cv2.VideoCapture(rtsp_url)
         var_list = tuple(var_list) + ('stream',)
         if not thread_flag: raise Flag(var_list)
         if not stream.isOpened():
             raise IOError('Stream failed to open')
-        fps = stream.get(cv2.CAP_PROP_FPS)
         print(stream)
 
         #Connect to ftp server
@@ -138,28 +136,29 @@ def MainProcess(window, captureButton, mediaImage, mediaLabel, rtsp_url, ftp_ser
 
         now = datetime.datetime.now()
         attempt = 0
-        iterant = 0
-        info = ''
-        while thread_flag and attempt < 4:
-            #the try statement here that handles errors wuthin the while statement as such errors can be retried
+        while thread_flag:
+            #there should be a try statement here that handles errors wuthin the while statement
             try:
                 stream.grab()
-                if not thread_flag: raise Flag(var_list)
-                frame_num = stream.get(cv2.CAP_PROP_POS_FRAMES)
-                if not thread_flag: raise Flag(var_list)
-
-                ret, frame = stream.retrieve()
-                if not ret: raise cv2.VideoCaptureException('Failed to read frame')
-                if not thread_flag: raise Flag(var_list)
-
-                image = Image.fromarray(frame)
-                print(f'image: {image}')
-                picture = ImageTk.PhotoImage(image.resize((480, 270)))
-                mediaImage.config(image=picture)
-                mediaLabel.config(text=f'Frame Rate: {fps}fps\nBuffered Frame: {frame_num}; {info}')
-                #print(frame_num)
+                
                 with lock:
-                    if iterant == 0 or frame_num > iterant + (interval  * 10):
+                    timesnap = datetime.datetime.now()
+                    if not thread_flag: raise Flag(var_list)
+                    if now <= timesnap:
+                        stream_props = stream.get(cv2.CAP_PROP_POS_FRAMES)
+
+                        filename = f"img_{time.time()}.jpg"
+                        ret, frame = stream.retrieve()
+                        if not ret: raise cv2.VideoCaptureException('Failed to read frame')
+                        if not thread_flag: raise Flag(var_list)
+
+                        image = Image.fromarray(frame)
+                        print(f'image: {image}')
+                        picture = ImageTk.PhotoImage(image.resize((480, 270)))
+                        mediaImage.config(image=picture)
+                        mediaLabel.config(text=f'New Frame Captured')
+                        #time.sleep(1)
+                        #mediaLabel.config(text='')
 
                         #convert frame to image
                         captured, image = cv2.imencode('.jpg', frame)
@@ -167,7 +166,6 @@ def MainProcess(window, captureButton, mediaImage, mediaLabel, rtsp_url, ftp_ser
                         if not thread_flag: raise Flag(var_list)
                         
                         #write image to machine
-                        filename = f"img_{time.time()}.jpg"
                         with open(filename, "wb") as f:
                             f.write(image.tobytes())
                         f.close()
@@ -180,14 +178,18 @@ def MainProcess(window, captureButton, mediaImage, mediaLabel, rtsp_url, ftp_ser
                         f.close()
                         if not thread_flag: raise Flag(var_list)
                         print ('Image uploaded successfully!')
+                        mediaLabel.config(text='Frame Uploaded')
+                        #time.sleep(1)
+                        #mediaLabel.config(text='')
 
                         #delete file from system and clear memory
                         os.remove(filename)
                         #del filename, frame, image, f, _image, picture 
 
                         attempt = 0
-                        iterant = frame_num
-                        info=f' Last Uploaded: frame {frame_num}'
+                        timesnap = datetime.datetime.now()
+                        print (f'{timesnap}: Image Frame-{stream_props}added to machine')
+                        now = timesnap + datetime.timedelta(seconds=interval)
             except Flag as t:
                 raise Flag(var_list)
             except Exception as e:
