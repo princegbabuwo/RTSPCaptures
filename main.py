@@ -75,6 +75,7 @@ class Script:
         f.close()
         return config
     
+    #CODE startCaptureProcess
     def startCaptureProcess(self, rtsp_url = rtsp_url, ftp_server=ftp_server, ftp_user=ftp_user, ftp_password=ftp_password, ftp_dir=ftp_dir, interval=interval):
         """
         self.rtsp_url = rtsp_url
@@ -145,7 +146,7 @@ class Script:
         os.remove(filename)
         return True
 
-
+    #CODE Exception Handler
     def ExceptionHandler(self, sys, e, exit_code):
         exc_type, exc_obj, exc_tb = sys.exc_info()
         file_name = exc_tb.tb_frame.f_code.co_filename
@@ -160,6 +161,7 @@ class GUI:
         self.SettingsWindows = self.SettingsWindows()
         self.Events = self.Events()
 
+    #CODE HomeWindows
     class HomeWindows:
         def draw(self) -> None:
             self.window = Tk()
