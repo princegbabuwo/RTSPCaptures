@@ -31,7 +31,7 @@ def HomeWindow():
     window = Tk()
     window.title("RTSP Stream Capture")
     window.resizable(False, False)
-    icon = PhotoImage(file='assets/live2.png')
+    icon = PhotoImage(file='assets/live.png')
     window.wm_iconphoto(window, icon)
 
     style = ttk.Style()
