@@ -7,11 +7,8 @@
 #TODO onWindowsClosed -> Image & Resources Clean up -> Clean up accrued image & resources when flag is raised
 
 #CODE Imports
-from logging import config
-import time, datetime, cv2, queue, threading, os, sys, traceback, ftplib, yaml
-from typing import final
+import time, datetime, cv2, threading, os, sys, traceback, ftplib, yaml
 from tkinter import *
-#from ftplib import FTP
 from tkinter import ttk, messagebox
 from PIL import Image, ImageTk
 
