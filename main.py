@@ -10,6 +10,7 @@ from PIL import Image, ImageTk
 import yaml
 from threading import Thread
 
+#CODE Script
 class Script:
     thread = None
     thread_flag = True
@@ -20,6 +21,7 @@ class Script:
     ftp_dir = None
     interval = None
 
+    #CODE script.getConfiguration
     def getFTPServerConfiguration(self):
         config = None
         try: 
@@ -57,6 +59,7 @@ class Script:
         
         return True
 
+    #CODE script.defineYamlFile
     def defineYamlFile(self, server, user, password, dir, interval):
         return {
             'server': server,
@@ -155,13 +158,14 @@ class Script:
         print(f"\nError: {str(e)}")
         sys.exit(exit_code)
 
+#CODE GUI
 class GUI:
     def __init__(self) -> None:
         self.HomeWindows = self.HomeWindows()
         self.SettingsWindows = self.SettingsWindows()
         self.Events = self.Events()
 
-    #CODE HomeWindows
+    #CODE GUI.HomeWindows
     class HomeWindows:
         def draw(self) -> None:
             self.window = Tk()
@@ -232,7 +236,7 @@ class GUI:
                         self.updateCaptureButton('start')
                     self.captureButton.configure(text='STOP CAPTURE', command=__command)
 
-
+    #CODE GUI.SettingsWindows
     class SettingsWindows:
         def __draw(self, config) -> None:
             self.window = Toplevel(gui.HomeWindows.window)
@@ -335,6 +339,7 @@ class GUI:
             except ValueError: return 0
             else: return interval
 
+    #CODE GUI.Events
     class Events:
         GUI = None
         HomeWindows = None
@@ -345,10 +350,12 @@ class GUI:
             self.SettingsWindow = SettingsWindow
             print(f'Settings Windows @-Event: {self.SettingsWindow}')
 
+        #CODE Events.OnWindowsOpen
         def onWindowsOpen(self):
             if not script.checkFTPServerConfiguration():
                 gui.Events.OpenDialogForSettings()
 
+        #CODE Events.openDialogSettings
         def OpenDialogForSettings(self):
             config = script.getFTPServerConfiguration()
             #print (f'Config: {config}')
