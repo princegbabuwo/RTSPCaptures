@@ -218,6 +218,7 @@ class GUI:
             self.draw()
             #self.window.mainloop()
 
+        #CODE HomeWindows.UpdateCapture Button
         def updateCaptureButton(self, state):
             print('am in update capture')
             match state:
