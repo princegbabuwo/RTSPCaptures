@@ -31,7 +31,7 @@ def HomeWindow():
     window = Tk()
     window.title("RTSP Stream Capture")
     window.resizable(False, False)
-    icon = PhotoImage(file='assets/live.png')
+    icon = PhotoImage(file='assets/live2.png')
     window.wm_iconphoto(window, icon)
 
     style = ttk.Style()
@@ -176,7 +176,7 @@ def MainProcess(window, captureButton, mediaImage, mediaLabel, rtsp_url, ftp_ser
         var_list = tuple(var_list) + ('ftp',)
         if not thread_flag: raise Flag(var_list)
         ftp.login(ftp_user, ftp_password)
-        #TODO switch to directory
+        if ftp_dir: ftp.cwd(ftp_dir)
 
         now = datetime.datetime.now()
         while thread_flag:
@@ -282,7 +282,7 @@ def updateConfigurationFile(rtsp_url=None, ftp_server=None, ftp_user=None, ftp_p
     if ftp_server: config['server'] = ftp_server
     if ftp_user: config['user'] = ftp_user
     if ftp_password: config['password'] = ftp_password
-    if ftp_dir: config['dir'] = ftp_dir
+    if ftp_dir != None: config['dir'] = ftp_dir
     if interval: config['interval'] = interval
     #print (config)
 

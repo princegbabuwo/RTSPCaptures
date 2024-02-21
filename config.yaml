@@ -1,0 +1,6 @@
+dir: RTSP
+interval: '10'
+password: 8mbDdHkropu4NpffBnvUYpQEz884iY3V
+server: eu-central-1.sftpcloud.io
+url: http://pendelcam.kip.uni-heidelberg.de/mjpg/video.mjpg
+user: 23b1c1360e6947f3b2ae33e14583dad2
