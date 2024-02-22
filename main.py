@@ -14,6 +14,7 @@ from PIL import Image, ImageTk
 
 #CODE globals
 thread_flag = True
+basedir = os.path.dirname(__file__)
 
 #CODE Flag => Custom Error Manager
 class Flag(Exception):
@@ -28,7 +29,7 @@ def HomeWindow():
     window = Tk()
     window.title("RTSP Stream Capture")
     window.resizable(False, False)
-    icon = PhotoImage(file='assets/live2.png')
+    icon = PhotoImage(file=os.path.join(basedir, 'assets', 'live2.png'))
     window.wm_iconphoto(window, icon)
 
     style = ttk.Style()
@@ -52,7 +53,7 @@ def HomeWindow():
     #ButtonsFrame
     buttonFrame = ttk.Frame(windowFrame)
     captureButton = ttk.Button(buttonFrame, text="START CAPTURE", width=52, style='capture.TButton', command=lambda: (onCaptureButtonClick(window, captureButton, mediaImage, mediaLabel, urlText.get())))
-    settingsIcon = PhotoImage(file='assets/settings.png')
+    settingsIcon = PhotoImage(file=os.path.join(basedir, 'assets', 'settings.png'))
     settingsButton = ttk.Button(buttonFrame, image=settingsIcon, width=5, style='icon.TButton', command=lambda: openDialogForSettings(window))
 
     #TK Grids
@@ -205,7 +206,7 @@ def MainProcess(window, captureButton, mediaImage, mediaLabel, rtsp_url, ftp_ser
                     if not thread_flag: raise Flag(var_list)
                     
                     #write image to machine
-                    with open(filename, "wb") as f:
+                    with open(os.path.join(basedir, filename), "wb") as f:
                         f.write(image.tobytes())
                     f.close()
                     del f
@@ -214,7 +215,7 @@ def MainProcess(window, captureButton, mediaImage, mediaLabel, rtsp_url, ftp_ser
                     #raise IOError('Intentional Error')
 
                     #upload image to ftp server
-                    with open(filename, "rb") as f:
+                    with open(os.path.join(basedir, filename), "rb") as f:
                         ftp.storbinary(f"STOR {filename}", f) #I want to belive this function calls a continue
                     f.close()
                     if not thread_flag: raise Flag(var_list)
@@ -264,7 +265,7 @@ def MainProcess(window, captureButton, mediaImage, mediaLabel, rtsp_url, ftp_ser
 def getConfiguration():
     config = None
     try: 
-        with open('config.yaml', 'r') as f:
+        with open(os.path.join(basedir, 'config.yaml'), 'r') as f:
             config = yaml.safe_load(f)
         f.close()
     except: pass
@@ -284,7 +285,7 @@ def updateConfigurationFile(rtsp_url=None, ftp_server=None, ftp_user=None, ftp_p
     #print (config)
 
     try:
-        with open('config.yaml', 'w') as f:
+        with open(os.path.join(basedir, 'config.yaml'), 'w') as f:
             yaml.dump(config, f, allow_unicode=True)
         f.close()
     except: return None
