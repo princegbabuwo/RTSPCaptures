@@ -1,5 +1,6 @@
 #User Defined
 config.yaml
+myvenv/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -130,7 +131,6 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-myvenv/
 
 # Spyder project settings
 .spyderproject
